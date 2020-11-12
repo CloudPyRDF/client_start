@@ -8,9 +8,15 @@ def start_lambdas(conf_file):
     #Read data from configuration file
     f = open(conf_file, "r")
     
-    login = f.readline()
-    password = f.readline()
+    eos_login = f.readline()
+    eos_password = f.readline()
 
+    f.readline()
+    
+    aws_access_key = f.readline()
+    aws_secret_key = f.readline()
+    aws_session_token = f.readline()
+    
     f.readline()
 
     funs = []
@@ -36,7 +42,10 @@ def start_lambdas(conf_file):
     f.close()
 
 
-    client = boto3.client('lambda')
+    client = boto3.client('lambda',
+    aws_access_key_id = aws_access_key,
+    aws_secret_access_key = aws_secret_key,
+    aws_session_token = aws_session_token)
 
     for eos_url, bucket_name, object_key in eos, bucket_names, object_keys:
         client.invoke(
