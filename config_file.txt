@@ -1,17 +1,18 @@
-eos_login
-eos_password
+{
+	'credentials': {
+		'login': eos_login
+		'password': eos_password
+	},
 
-fun1
-fun2
+	'scripts': [script1, script2],
+	
+	'eos_paths': [eos_path1, eos_path2],
+	
+	'eos_filenames': [filename1. filename2],
 
-eos_path1
-eos_path2
+	's3_bucket_names': [bucket_name1, bucket_name2],
 
-bukcet_name1
-bucket_name2
-
-objeckt_key1
-object_key2
-
-file_path1
-file_path2
+	's3_object_keys': [objeckt_key1, object_key2],
+	
+	's3_out_bucket_names': [out_bucket1, out_bucket2]
+}

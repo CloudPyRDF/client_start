@@ -1,91 +1,61 @@
 import json
 import boto3
+import time
 
+
+def wait_for_complition(function_name):
+
+    while True:
+        if client.get_function(FunctionName=function_name)['Configuration']['State'] == 'Inactive':
+            break
+        
+        if client.get_function(FunctionName=function_name)['Configuration']['State'] == 'Failed':
+            raise Exception("Function failed!!!") 
+            
+        time.sleep(1)    
 
 def start_lambdas(conf_file):
     
     #Read data from configuration file
-    f = open(conf_file, "r")
-    
-    eos_login = f.readline()
-    eos_password = f.readline()
-
-    f.readline()
-
-    funs = []
-    while((line = f.readline()) != '/n'):
-	funs.append(line)
-
-    eos = []
-    while((line = f.readline()) != '/n'):
-	eos.append(line)
-
-    bucket_names = []
-    while((line = f.readline()) != '/n'):
-	bucket_names.append(line)
-
-    object_keys = []
-    while((line = f.readline()) != '/n'):
-	object_keys.append(line)
-
-    filenames = []
-    while((line = f.readline()) != '/n'):
-	filenames.append(line)
-    
-    f.close()
+    conf = json.loads(conf_file)
 
     client = boto3.client('lambda')
 
-    for eos_url, bucket_name, object_key in eos, bucket_names, object_keys:
+    for eos_path, eos_file, bucket_name, object_key in conf['eos_paths'], conf['eos_filenames'], conf['s3_bucket_names'], conf['s3_object_keys']:
         client.invoke(
             FunctionName = "eos_lambda",
             InvocationType = "Event",
             Payload = {
-                path: "eos_url",
-                login: login,
-                password: password,
-                bucket_name: bucket_name,
-                object_key: object_key
+                eos_path: eos_url,
+                eos_filename: eos_file,
+                eos_login: conf['credentials']['login'],
+                eos_password: conf['credentials']['password'],
+                s3_bucket_name: bucket_name,
+                s3_object_key: object_key
                 
             }
         )
     
-    while True:
-        if client.get_function(FunctionName="eos_lambda")['Configuration']['State'] == 'Inactive':
-            break
+    wait_for_complition("eos_lambda")
     
-    for bucket_name, object_key in bucket_names, object_keys:
-        s3_path = "https://s3.us-east-1.amazonaws.com/" + bucket_name/ + object_key
+    
+    for script, in_bucket_name, object_key, out_bucket_name in conf['scripts'], conf['s3_bucket_names'], conf['s3_object_keys'], conf['s3_out_bucket_names']:
         client.invoke(
-            FunctionName = "root_lambda".
+            FunctionName = "root_lambda",
             InvocationType = "Event",
             Payload = {
-                s3_path: s3_path,
-            }
+              in_bucket: in_bucket_name,
+              in_bucket_file_path: object_key,
+
+              script: script,
+
+              out_bucket:out_bucket_name,
+              out_bucket_file_path: object_key
+}
         )
     
-    while True:
-        if client.get_function(FunctionName="root_lambda")['Configuration']['State'] == 'Inactive':
-            break
+    wait_for_complition("root_lambda")
     
-    
-    for fun, bucket_name, object_key, file_path in funcs, bucket_names, object_keys, filenames:
-        in_bucket_name = "https://s3.us-east-1.amazonaws.com/" + bucket_name + "/" + key_name
-        out_bucket_name = "https://s3.us-east-1.amazonaws.com/" + bucket_name + "/" + key_name + "/result"
-        client.invoke(
-            FunctionName = "map_lambda",
-            InvocationType = "Event",
-            Payload = {
-                in_bucket_name: in_bucket_name,
-                out_bucket_name: out_bucket_name,
-                script: fun,
-                file_path: file_path
-            }
-        )
-    
-    while True:
-        if client.get_function(FunctionName="map_lambda")['Configuration']['State'] == 'Inactive':
-            break
     
     return {
         'statusCode': 200,
