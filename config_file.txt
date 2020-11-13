@@ -1,10 +1,6 @@
 eos_login
 eos_password
 
-aws_access_key 
-aws_secret_key
-aws_session_token
-
 fun1
 fun2
 
