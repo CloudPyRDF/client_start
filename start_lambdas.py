@@ -1,6 +1,7 @@
 import json
 import boto3
 import time
+import uproot
 
 
 def wait_for_complition(function_name):
@@ -37,7 +38,10 @@ def map(login, password, scripts, eos_paths, eos_filenames, s3_buckets, s3_objec
         exit(1)
     
     
-    for script, object_key in scripts, s3_object_keys:
+    for script_file_name, object_key in scripts, s3_object_keys:
+        script_file = open(script_file_name, "r")
+        script = script_file.read()
+        script_file.close()
         client.invoke(
             FunctionName = "root_lambda",
             InvocationType = "Event",
@@ -55,19 +59,23 @@ def map(login, password, scripts, eos_paths, eos_filenames, s3_buckets, s3_objec
     except:
         print("Function root_lambda failed, exiting program...")
         exit(1)
-        
-def reduce(bucket):
+ 
+def extract_from_root(res_file, s3_object_keys):
+    #TODO
+ 
+def reduce(bucket, s3_object_keys):
     
-    request = client.invoke(
-                  FunctionName = "reduce_lambda",
-                  InvocationType = "RequestResponse",
-                  Payload = {
-                    bucket: bucket
-                  }
-              )
+    client = boto3.clinet('s3')
+    
+    for object_key in s3_object_keys:
+        file_path = "./" + object_key
+        client.download_file(bucket, object_key, file_path)
 
-    return json.loads(request)['result']
+    res_file = uproot.create("./result.root")
     
+    extract_from_root(res_file, s3_object_keys)
+    
+    res_file.close()
 
 def start_lambdas(conf_file, s3_buckets):
     
@@ -85,6 +93,6 @@ def start_lambdas(conf_file, s3_buckets):
 
     map(login, password, scripts, eos_paths, eos_filenames, s3_buckets, s3_object_keys, client)
     
-    result = reduce(s3_buckets[1])
+    reduce(s3_buckets[1], s3_object_keys)
     
     
