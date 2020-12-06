@@ -1,0 +1,12 @@
+{
+  "input_bucket_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:s3:::terraform-20201203102922975500000003"
+  },
+  "output_bucket_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:s3:::terraform-20201203102922975500000002"
+  }
+}
