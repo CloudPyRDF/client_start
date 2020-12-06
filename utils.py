@@ -25,10 +25,10 @@ def wait_for_completion(client, function_name):
         return False
 
 
-def invoke_lambda(client, name, payload, synchronous=False):
-    client.invoke(
+def invoke_lambda(client, name, payload, synchronous=True):
+    return client.invoke(
         FunctionName=name,
-        InvocationType="RequestResponse" if synchronous else "Event",
+        # InvocationType="RequestResponse" if synchronous else "Event",
         Payload=bytes(
             json.dumps(payload),
             encoding='utf8'
@@ -40,8 +40,8 @@ def read_terraform_config(terraform_conf_file):
         terraform_output = json.load(config)
 
     buckets = {
-        "input": terraform_output["input_bucket_arn"]["value"],
-        "output": terraform_output["output_bucket_arn"]["value"],
+        "input": terraform_output["input_bucket_arn"]["value"].split(":")[-1],
+        "output": terraform_output["output_bucket_arn"]["value"].split(":")[-1],
     }
 
     return buckets

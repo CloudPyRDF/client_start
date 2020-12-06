@@ -1,15 +1,13 @@
 {
   "credentials": {
-    "login": "eos_login",
-    "password": "eos_password"
+    "login": "login",
+    "password": "password"
   },
   "script": "example/example_script.py",
   "eos_paths": [
-    "eos_path1/filename1",
-    "eos_path2/filename2"
+    "/root-eos/cms_opendata_2012_nanoaod/Run2012B_DoubleMuParked.root"
   ],
   "s3_object_keys": [
-    "object_key1",
-    "object_key2"
+    "Run2012B_DoubleMuParked.root"
   ]
 }

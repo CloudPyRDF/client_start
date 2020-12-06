@@ -7,7 +7,7 @@ def lambda_reduce(configuration, client):
     s3_object_keys = configuration["s3"]["files"]
     s3_output_bucket = configuration["s3"]["buckets"]["output"]
 
-    s3 = boto3.client('lambda')
+    s3 = boto3.client('s3')
 
     result_fname = invoke_lambda(
         client,
