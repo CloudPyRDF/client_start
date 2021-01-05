@@ -2,7 +2,7 @@
 import ROOT
 import PyRDF
 # Configure PyRDF splitting the dataset into 32 partitions
-PyRDF.use("spark", {'npartitions': 32})
+PyRDF.use("AWS", {'npartitions': 32})
 PyRDF.RDataFrame("Events", fileName);
 df = PyRDF.RDataFrame("Events", fileName);
 df_2mu = df.Filter("nMuon == 2", "Events with exactly two muons");
