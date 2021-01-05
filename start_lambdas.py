@@ -27,7 +27,6 @@ def read_config(user_conf_file, terraform_conf_file):
 
     # script to execute
     script = read_file(conf['script'])
-    s3_buckets = read_terraform_config(terraform_conf_file)
     configuration = {
         "eos": {
             "credentials": {
@@ -36,10 +35,6 @@ def read_config(user_conf_file, terraform_conf_file):
             },
             "paths": eos_paths,
             "filenames": eos_filenames,
-        },
-        "s3": {
-            "files": conf['s3_object_keys'],
-            "buckets": s3_buckets
         },
         "script": script
     }
